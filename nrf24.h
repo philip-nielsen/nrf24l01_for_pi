@@ -65,6 +65,9 @@ void    nrf24_configRegister(uint8_t reg, uint8_t value);
 void    nrf24_readRegister(uint8_t reg, uint8_t* value, uint8_t len);
 void    nrf24_writeRegister(uint8_t reg, uint8_t* value, uint8_t len);
 
+/* Intrerrupt status */
+uint8_t nrf24_irqReason();
+
 /* -------------------------------------------------------------------------- */
 /* You should implement the platform spesific functions in your code */
 /* -------------------------------------------------------------------------- */
@@ -103,14 +106,14 @@ extern void nrf24_sck_digitalWrite(uint8_t state);
 /* -------------------------------------------------------------------------- */
 /* nrf24 MOSI pin control function
  *    - state:1 => Pin HIGH
- *    - state:0 => Pin LOW     */
-/* -------------------------------------------------------------------------- */
+ *    - state:0 => Pin LOW     
+* -------------------------------------------------------------------------- */
 extern void nrf24_mosi_digitalWrite(uint8_t state);
 
 /* -------------------------------------------------------------------------- */
 /* nrf24 MISO pin read function
-/* - returns: Non-zero if the pin is high */
-/* -------------------------------------------------------------------------- */
+* - returns: Non-zero if the pin is high 
+* -------------------------------------------------------------------------- */
 extern uint8_t nrf24_miso_digitalRead();
 
 #endif

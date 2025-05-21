@@ -1,11 +1,13 @@
 /*
  * ----------------------------------------------------------------------------
  * “THE COFFEEWARE LICENSE” (Revision 1):
- * <ihsan@kehribar.me> wrote this file. As long as you retain this notice you
+ * <ihsan@kehribar.me> wrote most of this file. As long as you retain this notice you
  * can do whatever you want with this stuff. If we meet some day, and you think
  * this stuff is worth it, you can buy me a coffee in return.
  * -----------------------------------------------------------------------------
  * This library is based on this library:
+ *   https://github.com/kehribar/nrf24L01_plus/tree/master
+ * Which is based on this library:
  *   https://github.com/aaronds/arduino-nrf24l01
  * Which is based on this library:
  *   http://www.tinkerer.eu/AVRLib/nRF24L01
@@ -17,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <wiringPiSPI.h>
+#include <wiringPi.h>
 
 #ifndef SPI_CHANNEL
 #define SPI_CHANNEL -1 //Default value, not to be used
@@ -198,8 +201,10 @@ void nrf24_send(uint8_t *value) {
   /* Pull up chip select */
   nrf24_csn_digitalWrite(HIGH);
 
-  /* Start the transmission */
+  /* Start the transmission with minimum 10µs CE pulse */
   nrf24_ce_digitalWrite(HIGH);
+  delayMicroseconds(15);  // Datasheet: CE ≥ 10µs
+  nrf24_ce_digitalWrite(LOW);
 }
 
 uint8_t nrf24_isSending() {
@@ -253,6 +258,7 @@ void nrf24_powerUpRx() {
 
   nrf24_ce_digitalWrite(LOW);
   nrf24_configRegister(CONFIG, nrf24_CONFIG | ((1 << PWR_UP) | (1 << PRIM_RX)));
+  delay(2);
   nrf24_ce_digitalWrite(HIGH);
 }
 
@@ -260,6 +266,7 @@ void nrf24_powerUpTx() {
   nrf24_configRegister(STATUS, (1 << RX_DR) | (1 << TX_DS) | (1 << MAX_RT));
 
   nrf24_configRegister(CONFIG, nrf24_CONFIG | ((1 << PWR_UP) | (0 << PRIM_RX)));
+  delay(2);
 }
 
 void nrf24_powerDown() {
@@ -315,4 +322,10 @@ void nrf24_writeRegister(uint8_t reg, uint8_t *value, uint8_t len) {
   spi_transfer(W_REGISTER | (REGISTER_MASK & reg));
   nrf24_transmitSync(value, len);
   nrf24_csn_digitalWrite(HIGH);
+}
+
+/* Get interrupt reason */
+uint8_t nrf24_irqReason() {
+  uint8_t status = nrf24_getStatus();
+  return status & ((1 << RX_DR) | (1 << TX_DS) | (1 << MAX_RT));
 }
