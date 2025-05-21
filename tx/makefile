@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -I.. 
+CFLAGS = -Wall -I.. -DSPI_CHANNEL=1 #Use channel 1 for SPI
 LDFLAGS = -lwiringPi
 
 SRC = tx.c nrf24_gpio.c ../nrf24.c

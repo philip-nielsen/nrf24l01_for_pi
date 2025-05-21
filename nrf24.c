@@ -18,7 +18,10 @@
 #include <stdlib.h>
 #include <wiringPiSPI.h>
 
-#define SPI_CHANNEL 0     // CE0
+#ifndef SPI_CHANNEL
+#define SPI_CHANNEL -1 //Default value, not to be used
+#endif
+
 #define SPI_SPEED 8000000 // 8 MHz is safe for nRF24L01+
 
 uint8_t payload_len;
@@ -26,6 +29,11 @@ uint8_t payload_len;
 /* init the hardware pins */
 void nrf24_init() {
   nrf24_setupPins();
+
+  if (SPI_CHANNEL == -1) {
+    fprintf(stderr, "SPI needs to be set!\n");
+    exit(1);
+  }
 
   if (wiringPiSPISetup(SPI_CHANNEL, SPI_SPEED) < 0) {
     fprintf(stderr, "SPI Setup failed!\n");
